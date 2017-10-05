@@ -1,0 +1,94 @@
+DEFINE INSTRUMENT McStas_MCPL_input()
+/*
+ * This file has been automatically generated using the mcstas2vitess tool.
+ * See http://www.mcstas.org
+ * Component MCPL_input converted into an instrument with Vitess I/O functions
+ */
+DECLARE
+%{
+#define printf(...) fprintf(stderr,__VA_ARGS__)
+#define fprintf(stdout,...) fprintf(stderr,__VA_ARGS__)
+/* Component parameters. */
+double polarisationuse, verbose, Emin, Emax, repeat_count, E_smear, pos_smear, dir_smear, Ncount;
+char *filename;
+double pos_x, pos_y, pos_z;
+double *dptr[] =
+  {
+    &polarisationuse, &verbose, &Emin, &Emax, &repeat_count, &E_smear, &pos_smear, &dir_smear, &Ncount,
+    &pos_x, &pos_y, &pos_z,
+    0
+  };
+char **sptr[] =
+  {
+    &filename,
+    0
+  };
+char dchr[] =
+  {
+    'a', 'b', 'c', 'd', 'e', 'g', 'h', 'i', 'n',
+    'x', 'y', 'z', 0
+  };
+char schr[] =
+  {
+    'I',
+    0
+  };
+
+/* vitess-lib will be included when embedding Vitess_input component */
+
+/* Pointer to check whether all neutrons have been read. */
+int *check_finished;
+
+/* event parameters that exist in VITESS, but not in McStas */
+short   vitess_col;
+TotalID vitess_ID;
+
+/* Our main() function. */
+int main(int argc, char *argv[])
+{
+
+  srandom(time(NULL));  /* Random seed */
+  vitess_parseopt(argc, argv, dptr, dchr, sptr, schr); /* VITESS-style option parser */
+  mcinit();
+  double our_ncount=-1;
+  do
+  {
+    mcsetstate(0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1);
+    mcraytrace();
+    our_ncount++;
+  } while(our_ncount < Ncount);
+
+  mcfinally();
+  exit(0);
+}
+%}
+INITIALIZE
+%{
+  %include "vitess-lib.h"
+  /* This double-indirection is necessary here since MC_GETPAR is not
+     available in the DECLARE section. */
+  check_finished = 0;
+  vitess_col =0;
+%}
+TRACE
+
+COMPONENT vitess_in = Arm()
+    
+  AT (0, 0, 0) ABSOLUTE
+
+COMPONENT comp = MCPL_input(
+    filename=filename, polarisationuse=polarisationuse, verbose=verbose, Emin=Emin, Emax=Emax, repeat_count=repeat_count, E_smear=E_smear, pos_smear=pos_smear, dir_smear=dir_smear)
+  AT (pos_x, pos_y, pos_z) ABSOLUTE
+  ROTATED (0, 0, 0) ABSOLUTE
+
+COMPONENT vitess_out = Vitess_output(
+    filename = "stdout", bufsize = vitess_bufsize,
+    progress = vitess_tracepoints)
+  AT (0, 0, 0) ABSOLUTE
+
+FINALLY
+%{
+    
+%}
+
+END
