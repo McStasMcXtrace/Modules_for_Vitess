@@ -15,3 +15,7 @@ Compilation process:
       2. i686-w64-mingw32-gcc McStas_ESS_butterfly_MCPL.c -o mcstas_ess_butterfly_mcpl.exe -lm -O2 -IMCPL/ -LMCPL -lmcpl
 
 3) The mcstas_ess_butterfly_mcpl.tcl snippet has various local modifications for reasonable defaults within the Vitess system
+
+Please use this module with the input files available at 
+       http://public.esss.dk/users/willend/MCPL/
+

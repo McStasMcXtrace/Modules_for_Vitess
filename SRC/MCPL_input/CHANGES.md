@@ -18,3 +18,5 @@ Compilation process:
       2. i686-w64-mingw32-gcc McStas_MCPL_input.c -o mcstas_ess_butterfly.exe -lm -O2 -IMCPL/ -LMCPL -lmcpl
 
 4) The mcstas_mcpl_input.tcl snippet has various local modifications for reasonable defaults within the Vitess system
+
+A voutput.mcpl example MCPL file has been added for your convenience
