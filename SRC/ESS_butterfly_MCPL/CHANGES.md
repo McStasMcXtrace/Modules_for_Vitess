@@ -7,10 +7,10 @@ Compilation process:
    event file x repeat_count. For the same reason, the module has no "ncount" defined.
 
 2) McStas and gcc were run manually for the module generation:
-   a) mcstas --no-main McStas_ESS_butterfly.instr -o McStas_ESS_butterfly.c
-   b) MacOS: gcc McStas_ESS_butterfly.c -o mcstas_ess_butterfly_Darwin_x86_64 -lm -O2 -I$MCSTAS/libs/mcpl/ -L$MCSTAS/libs/mcpl/ -lmcpl
-   c) Linux: gcc McStas_ESS_butterfly.c -o mcstas_ess_butterfly_Linux_x86_64 -lm -O2 -I$MCSTAS/libs/mcpl/ -L$MCSTAS/libs/mcpl/ -lmcpl
+   a) mcstas --no-main McStas_ESS_butterfly_MCPL.instr -o McStas_ESS_butterfly_MCPL.c
+   b) MacOS: gcc McStas_ESS_butterfly_MCPL.c -o mcstas_ess_butterfly_MCPL_Darwin_x86_64 -lm -O2 -I$MCSTAS/libs/mcpl/ -L$MCSTAS/libs/mcpl/ -lmcpl
+   c) Linux: gcc McStas_ESS_butterfly_MCPL.c -o mcstas_ess_butterfly_MCPL_Linux_x86_64 -lm -O2 -I$MCSTAS/libs/mcpl/ -L$MCSTAS/libs/mcpl/ -lmcpl
    d) Linux - for Windows: 
       1. First you need to recompile an MCPL lib using mingw and place it somewhere, e.g. $PWD/MCPL/
-      2. i686-w64-mingw32-gcc McStas_ESS_butterfly.c -o mcstas_ess_butterfly.exe -lm -O2 -IMCPL/ -LMCPL -lmcpl
+      2. i686-w64-mingw32-gcc McStas_ESS_butterfly_MCPL.c -o mcstas_ess_butterfly_MCPL.exe -lm -O2 -IMCPL/ -LMCPL -lmcpl
 
