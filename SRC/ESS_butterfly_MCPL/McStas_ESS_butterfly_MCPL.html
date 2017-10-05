@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD>
+<TITLE>McStas: McStas_ESS_butterfly Instrument at </TITLE>
+<LINK REV="made" HREF="mailto:peter.willendrup@risoe.dk">
+</HEAD>
+
+<BODY>
+
+<P ALIGN=CENTER>
+ [ <A href="#id">Identification</A>
+ | <A href="#desc">Description</A>
+ | <A href="#ipar">Input parameters</A>
+ | <A href="#opar">Output parameters</A>
+ | <A href="#links">Links</A> ]
+</P>
+
+<H1>The <CODE>McStas_ESS_butterfly</CODE> Instrument</H1>
+
+  else
+  printf("MCPLfile is %s\n",MCPLfile);
+%}
+TRACE
+COMPONENT vitess_in = Arm()
+  AT (0, 0, 0) ABSOLUTE
+/* read neutrons from an mcpl file*/
+COMPONENT vinROT2 = Arm()
+AT(pos_x, pos_y, pos_z) RELATIVE PREVIOUS
+  ROTATED (0,-90,0) RELATIVE PREVIOUS
+COMPONENT vinROT1 = Arm()
+AT(0,0,0) RELATIVE PREVIOUS
+  ROTATED (-90,0,0) RELATIVE PREVIOUS
+  COMPONENT vin = MCPL_input(filename=MCPLfile,verbose=1,repeat_count=repeat,E_smear=E_smear,pos_smear=pos_smear,dir_smear=dir_smear)
+AT(0,0,0) RELATIVE PREVIOUS
+EXTEND %{
+  if(p>thres) {ABSORB;}
+  else {SCATTER;}
+  p*=1.56e16;
+  p/=1e5;
+  z=z-0.137;
+%}
+COMPONENT vitess_out = Vitess_output(
+    filename = "stdout", bufsize = vitess_bufsize,
+    progress = vitess_tracepoints)
+  AT (0, 0, 0) ABSOLUTE
+FINALLY
+%{
+%}
+END
+
+
+<H2><A NAME=id></A>Identification</H2>
+
+<UL>
+  <LI> <B>Site:   </B>
+  <LI> <B>Author:</B>(Unknown)</B>
+  <LI> <B>Origin:</B>(Unknown)</B>
+  <LI> <B>Date:</B>(Unknown)</B>
+  <LI> <B>Version:</B>(Unknown)</B>
+</UL>
+
+<H2><A NAME=ipar></A>Input parameters</H2>
+None.
+
+<H2><A NAME=links></A>Links</H2>
+
+<UL>
+  <LI> <A HREF="/Users/pkwi/Projects/Vitess-ESS-Survival-kit-2017/SRC/ESS_butterfly_MCPL/">Source code</A> for <CODE>McStas_ESS_butterfly.instr</CODE>.
+</UL>
+<HR>
+<P ALIGN=CENTER>
+ [ <A href="#id">Identification</A>
+ | <A href="#desc">Description</A>
+ | <A href="#ipar">Input parameters</A>
+ | <A href="#opar">Output parameters</A>
+ | <A href="#links">Links</A> ]
+</P>
+
+<ADDRESS>
+Generated automatically by McDoc, Peter Willendrup
+&lt;<A HREF="mailto:peter.willendrup@risoe.dk">peter.willendrup@risoe.dk</A>&gt; /
+Tue Sep 19 17:48:42 2017</ADDRESS>
+</BODY></HTML>

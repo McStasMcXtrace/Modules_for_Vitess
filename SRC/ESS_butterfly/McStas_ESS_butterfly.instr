@@ -1,0 +1,94 @@
+DEFINE INSTRUMENT McStas_ESS_butterfly()
+/*
+ * This file has been automatically generated using the mcstas2vitess tool.
+ * See http://www.mcstas.org
+ * Component ESS_butterfly converted into an instrument with Vitess I/O functions
+ */
+DECLARE
+%{
+#define printf(...) fprintf(stderr,__VA_ARGS__)
+#define fprintf(stdout,...) fprintf(stderr,__VA_ARGS__)
+/* Component parameters. */
+double beamline, yheight, cold_frac, dist, focus_xw, focus_yh, c_performance, t_performance, Lmin, Lmax, tmax_multiplier, n_pulses, acc_power, tfocus_dist, tfocus_time, tfocus_width, Ncount;
+char *sector;
+double pos_x, pos_y, pos_z;
+double *dptr[] =
+  {
+    &beamline, &yheight, &cold_frac, &dist, &focus_xw, &focus_yh, &c_performance, &t_performance, &Lmin, &Lmax, &tmax_multiplier, &n_pulses, &acc_power, &tfocus_dist, &tfocus_time, &tfocus_width, &Ncount,
+    &pos_x, &pos_y, &pos_z,
+    0
+  };
+char **sptr[] =
+  {
+    &sector,
+    0
+  };
+char dchr[] =
+  {
+    'a', 'b', 'c', 'e', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'o', 'p', 'q', 'r', 's', 'n',
+    'x', 'y', 'z', 0
+  };
+char schr[] =
+  {
+    'S',
+    0
+  };
+
+/* vitess-lib will be included when embedding Vitess_input component */
+
+/* Pointer to check whether all neutrons have been read. */
+int *check_finished;
+
+/* event parameters that exist in VITESS, but not in McStas */
+short   vitess_col;
+TotalID vitess_ID;
+
+/* Our main() function. */
+int main(int argc, char *argv[])
+{
+
+  srandom(time(NULL));  /* Random seed */
+  vitess_parseopt(argc, argv, dptr, dchr, sptr, schr); /* VITESS-style option parser */
+  mcinit();
+  double our_ncount=-1;
+  do
+  {
+    mcsetstate(0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1);
+    mcraytrace();
+    our_ncount++;
+  } while(our_ncount < Ncount);
+
+  mcfinally();
+  exit(0);
+}
+%}
+INITIALIZE
+%{
+  %include "vitess-lib.h"
+  /* This double-indirection is necessary here since MC_GETPAR is not
+     available in the DECLARE section. */
+  check_finished = 0;
+  vitess_col =0;
+%}
+TRACE
+
+COMPONENT vitess_in = Arm()
+    
+  AT (0, 0, 0) ABSOLUTE
+
+COMPONENT comp = ESS_butterfly(
+    sector=sector, beamline=beamline, yheight=yheight, cold_frac=cold_frac, target_index=0, dist=dist, focus_xw=focus_xw, focus_yh=focus_yh, c_performance=c_performance, t_performance=t_performance, Lmin=Lmin, Lmax=Lmax, tmax_multiplier=tmax_multiplier, n_pulses=n_pulses, acc_power=acc_power, tfocus_dist=tfocus_dist, tfocus_time=tfocus_time, tfocus_width=tfocus_width)
+  AT (pos_x, pos_y, pos_z) ABSOLUTE
+  ROTATED (0, 0, 0) ABSOLUTE
+
+COMPONENT vitess_out = Vitess_output(
+    filename = "stdout", bufsize = vitess_bufsize,
+    progress = vitess_tracepoints)
+  AT (0, 0, 0) ABSOLUTE
+
+FINALLY
+%{
+    
+%}
+
+END

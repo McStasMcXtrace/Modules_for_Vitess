@@ -1,0 +1,199 @@
+DEFINE INSTRUMENT McStas_ESS_butterfly()
+/*
+ * This file has been automatically generated using the mcstas2vitess tool.
+ * See http://www.mcstas.org
+ * Component ESS_butterfly converted into an instrument with Vitess I/O functions
+ */
+DECLARE
+%{
+#define printf(...) fprintf(stderr,__VA_ARGS__)
+#define fprintf(stdout,...) fprintf(stderr,__VA_ARGS__)
+/* Component parameters. */
+  double beamline, filter, repeat, E_smear, pos_smear, dir_smear, thres;
+char *sector;
+double pos_x, pos_y, pos_z;
+double *dptr[] =
+  {
+    &beamline, &filter, &repeat, &E_smear, &pos_smear, &dir_smear, &thres,
+    &pos_x, &pos_y, &pos_z,
+    0
+  };
+char **sptr[] =
+  {
+    &sector,
+    0
+  };
+char dchr[] =
+  {
+    'a', 'f', 'r', 'E', 'P', 'D','T',
+    'x', 'y', 'z', 0
+  };
+char schr[] =
+  {
+    'S',
+    0
+  };
+
+/* vitess-lib will be included when embedding Vitess_input component */
+
+/* Pointer to check whether all neutrons have been read. */
+int *check_finished;
+int Beamline;
+/* event parameters that exist in VITESS, but not in McStas */
+short   vitess_col;
+TotalID vitess_ID;
+
+  int IsCold;
+  double SrcX, SrcY, SrcZ;
+  double Theta;
+  double MonTransl;
+  double WL;
+  double CCold,CThermal;
+  double SurfSign;
+  double TCollmin;
+  double TCollmax;
+  double Emin,Emax;
+  double EminTh=20, EmaxTh=100, EminC=0, EmaxC=20;
+  double Eneutron;
+  /* 10 beamlines in sector N and E  - plus one location added for drawing */
+  double iBeamlinesN[] = { 30.0,  36.0,  42.0,  48.0,  54.0,  60.0,  66.0,  72.0,  78.0,  84.0,  90.0};
+  double iBeamlinesE[] = {-30.0, -36.0, -42.0, -48.0, -54.0, -60.0, -66.0, -72.0, -78.0, -84.0, -90.0};
+  /* 11 beamlines in sector S and W - plus one location added for drawing */
+  double iBeamlinesW[] = { 150.0,  144.7,  138.0,  132.7,  126.0,  120.7,  114.0,  108.7,  102.0,  96.7,  90.0,  84.0};
+  double iBeamlinesS[] = {-150.0, -144.7, -138.0, -132.7, -126.0, -120.7, -114.0, -108.7, -102.0, -96.7, -90.0, -84.0};
+  double* iBeamlines;
+  double ANGLE;
+  double DeltaX,DeltaZ;
+  char MCPLfile[128];
+  double T0,L0;
+
+  double calcAlpha(double length, double radius) {
+    // calculate angle of arm after curved guide
+    return RAD2DEG * length/radius;
+  }	
+  
+  double calcX(double length, double radius) {
+    // calculate position and angle of arm after curved guide
+    double alpha = DEG2RAD * calcAlpha(length, radius);
+    return radius*(1.0-cos(alpha));
+  }	
+  
+  double calcZ(double length, double radius) {
+    // calculate position and angle of arm after curved guide
+    double alpha = DEG2RAD * calcAlpha(length, radius);
+    return radius*sin(alpha);
+  }
+
+  long long unsigned int mcNcount,Ncount2;
+  
+/* Our main() function. */
+int main(int argc, char *argv[])
+{
+
+  srandom(time(NULL));  /* Random seed */
+  vitess_parseopt(argc, argv, dptr, dchr, sptr, schr); /* VITESS-style option parser */
+  mcinit();
+  mcNcount=mcget_ncount();
+  Ncount2=0;
+  do
+  {
+    mcsetstate(0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1);
+    mcraytrace();
+    Ncount2++;
+  } while(Ncount2 < mcNcount);
+
+  mcfinally();
+  exit(0);
+}
+%}
+INITIALIZE
+%{
+  Beamline = beamline;
+  %include "vitess-lib.h"
+  /* This double-indirection is necessary here since MC_GETPAR is not
+     available in the DECLARE section. */
+  check_finished = 0;
+  vitess_col =0;
+  if (Beamline==1) {
+    TCollmin=0;
+    TCollmax=0.058;
+  } else if (Beamline==2) {
+    TCollmin=0;
+    TCollmax=0.06;
+  }
+  else {
+    TCollmin=0.011;
+    TCollmax=0.071;
+  }
+  if (strcasestr(sector,"N")) {
+    iBeamlines=iBeamlinesN;
+    DeltaX=-0.0585; DeltaZ=0.0925;
+  } else if (strcasestr(sector,"W")) {
+    iBeamlines=iBeamlinesW;
+    DeltaX=0.0585; DeltaZ=0.0925;
+  } else if (strcasestr(sector,"S")) {
+    iBeamlines=iBeamlinesS;
+    DeltaX=0.0585; DeltaZ=-0.0925;
+  } else if (strcasestr(sector,"E")) {
+    iBeamlines=iBeamlinesE;
+    DeltaX=-0.0585; DeltaZ=-0.0925;
+  }
+  ANGLE=iBeamlines[Beamline-1]-90;
+  if (filter==0)
+    sprintf(MCPLfile,"%s%i.mcpl.gz",sector,Beamline);
+  else
+    sprintf(MCPLfile,"%s%i_filtered.mcpl.gz",sector,Beamline);
+  printf("MCPLfile is %s\n",MCPLfile);
+%}
+TRACE
+
+COMPONENT vitess_in = Arm()
+    
+  AT (0, 0, 0) ABSOLUTE
+
+/* read neutrons from an mcpl file*/
+
+COMPONENT vinROT2 = Arm()
+AT(pos_x, pos_y, pos_z) RELATIVE PREVIOUS
+  ROTATED (0,-90,0) RELATIVE PREVIOUS
+
+COMPONENT vinROT1 = Arm()
+AT(0,0,0) RELATIVE PREVIOUS
+  ROTATED (-90,0,0) RELATIVE PREVIOUS
+
+  COMPONENT vin = MCPL_input(filename=MCPLfile,verbose=1,repeat_count=repeat,E_smear=E_smear,pos_smear=pos_smear,dir_smear=dir_smear)
+AT(0,0,0) RELATIVE PREVIOUS
+EXTEND %{
+  if(p>thres) {ABSORB;}
+  else {SCATTER;}
+  p*=1.56e16;
+  p/=1e5;
+  z=z-0.137;
+%}
+
+COMPONENT Beamline_Axis = Arm()
+ AT (DeltaX,0,DeltaZ) ABSOLUTE
+  ROTATED (0, ANGLE, 0) ABSOLUTE
+EXTEND %{
+  /* Propagate the neutron "2 m backwards" */
+  double ttmp;
+  ttmp = 2.0/sqrt(vx*vx+vy*vy+vz*vz);
+  x = x - ttmp*vx;
+  y = y - ttmp*vy;
+  z = z - ttmp*vz;
+%}
+
+/*COMPONENT Sphere = PSD_monitor_4PI(filename="test",radius=2.5, restore_neutron=1)
+  AT (0,0,0) RELATIVE PREVIOUS*/
+
+COMPONENT vitess_out = Vitess_output(
+    filename = "stdout", bufsize = vitess_bufsize,
+    progress = vitess_tracepoints)
+  AT (0,0,0) RELATIVE PREVIOUS
+
+FINALLY
+%{
+    
+%}
+
+END

@@ -1,0 +1,99 @@
+DEFINE INSTRUMENT McStas_MCPL_output()
+/*
+ * This file has been automatically generated using the mcstas2vitess tool.
+ * See http://www.mcstas.org
+ * Component MCPL_output converted into an instrument with Vitess I/O functions
+ */
+DECLARE
+%{
+#define printf(...) fprintf(stderr,__VA_ARGS__)
+#define fprintf(stdout,...) fprintf(stderr,__VA_ARGS__)
+/* Component parameters. */
+double polarisationuse, doubleprec, verbose, userflag, merge_mpi, keep_mpi_unmerged;
+char *filename, *userflagcomment;
+double pos_x, pos_y, pos_z;
+double *dptr[] =
+  {
+    &polarisationuse, &doubleprec, &verbose, &userflag, &merge_mpi, &keep_mpi_unmerged,
+    &pos_x, &pos_y, &pos_z,
+    0
+  };
+char **sptr[] =
+  {
+    &filename, &userflagcomment,
+    0
+  };
+char dchr[] =
+  {
+    'a', 'b', 'c', 'd', 'e', 'g',
+    'x', 'y', 'z', 0
+  };
+char schr[] =
+  {
+    'O', 'U',
+    0
+  };
+
+/* vitess-lib will be included when embedding Vitess_input component */
+
+/* Pointer to check whether all neutrons have been read. */
+int *check_finished;
+
+ int global_finished=0;
+/* event parameters that exist in VITESS, but not in McStas */
+short   vitess_col;
+TotalID vitess_ID;
+
+/* Our main() function. */
+int main(int argc, char *argv[])
+{
+
+  srandom(time(NULL));  /* Random seed */
+  vitess_parseopt(argc, argv, dptr, dchr, sptr, schr); /* VITESS-style option parser */
+  mcinit();
+  double our_ncount=-1;
+  do
+  {
+    mcsetstate(0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1);
+    mcraytrace();
+    our_ncount++;
+  } while(!*check_finished || !global_finished);
+
+  mcfinally();
+  exit(0);
+}
+%}
+INITIALIZE
+%{
+  %include "vitess-lib.h"
+  /* This double-indirection is necessary here since MC_GETPAR is not
+     available in the DECLARE section. */
+    check_finished = &MC_GETPAR(vitess_in, finished);
+  vitess_col =0;
+%}
+TRACE
+
+COMPONENT vitess_in = Vitess_input(
+    filename = vitess_infile, repeat_count = vitess_repcnt,
+    bufsize = vitess_bufsize)
+  AT (0, 0, 0) ABSOLUTE
+
+COMPONENT comp = MCPL_output(
+    polarisationuse=polarisationuse, doubleprec=doubleprec, verbose=verbose, userflag=userflag, filename=filename, userflagcomment=userflagcomment, merge_mpi=merge_mpi, keep_mpi_unmerged=keep_mpi_unmerged)
+  AT (pos_x, pos_y, pos_z) ABSOLUTE
+  ROTATED (0, 0, 0) ABSOLUTE
+ 
+COMPONENT vitess_out =  Vitess_output(
+    filename = "stdout", bufsize = vitess_bufsize,
+    progress = vitess_tracepoints)
+  AT (0, 0, 0) ABSOLUTE
+
+FINALLY
+%{
+    double p_sum=0.0, p2_sum=0.0;
+  p_sum  = MC_GETPAR(vitess_out, p_out);
+  p2_sum = MC_GETPAR(vitess_out, p2_out);
+  vitess_write(mcNCounter[1]-1, mcNCounter[3], p_sum, p2_sum, pos_x, pos_y, pos_z, 0.0, 0.0);  
+%}
+
+END

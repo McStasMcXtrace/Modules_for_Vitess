@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD>
+<TITLE>McStas: MCPL_input Component</TITLE>
+<LINK REV="made" HREF="mailto:peter.willendrup@risoe.dk">
+</HEAD>
+
+<BODY>
+
+<P ALIGN=CENTER>
+ [ <A href="#id">Identification</A>
+ | <A href="#desc">Description</A>
+ | <A href="#ipar">Input parameters</A>
+ | <A href="#opar">Output parameters</A>
+ | <A href="#links">Links</A> ]
+</P>
+
+<H1>The <CODE>MCPL_input</CODE> Component</H1>
+
+Source-like component that reads neutron state parameters from an mcpl-file.
+
+
+<H2><A NAME=id></A>Identification</H2>
+
+<UL>
+  <LI> <B>Author:</B> Erik B Knudsen</B>
+  <LI> <B>Origin:</B> DTU Physics</B>
+  <LI> <B>Date:</B> Mar 2016</B>
+  <LI> <B>Version:</B>(Unknown)</B>
+</UL>
+<H2><A NAME=desc></A>Description</H2>
+
+<PRE>
+Source-like component that reads neutron state parameters from a binary mcpl-file.
+
+MCPL is short for Monte Carlo Particle List, and is a new format for sharing events
+between e.g. MCNP(X), Geant4 and McStas.
+
+When used with MPI, the --ncount given on the commandline is overwritten by 
+#MPI nodes x #events in the file.
+
+%BUGS
+
+</PRE>
+
+<H2><A NAME=ipar></A>Input parameters</H2>
+Parameters in <B>boldface</B> are required;
+the others are optional.
+<TABLE BORDER=1>
+<TR><TH>Name</TH>  <TH>Unit</TH>  <TH>Description</TH> <TH>Default</TH></TR>
+<TR> <TD>filename</TD>
+     <TD>str</TD>
+     <TD>Name of neutron mcpl file to read.
+</TD>
+<TD ALIGN=RIGHT>0</TD> </TR>
+<TR> <TD>polarisationuse</TD>
+     <TD> </TD>
+     <TD>If !=0 read polarisation vectors from file.
+</TD>
+<TD ALIGN=RIGHT>1</TD> </TR>
+<TR> <TD>verbose</TD>
+     <TD> </TD>
+     <TD>Print debugging information for first 10 particles read.
+</TD>
+<TD ALIGN=RIGHT>1</TD> </TR>
+<TR> <TD>Emin</TD>
+     <TD>meV</TD>
+     <TD>Lower energy bound. Particles found in the MCPL-file below the limit are skipped.
+</TD>
+<TD ALIGN=RIGHT>0</TD> </TR>
+<TR> <TD>Emax</TD>
+     <TD>meV</TD>
+     <TD>Upper energy bound. Particles found in the MCPL-file above the limit are skipped.
+</TD>
+<TD ALIGN=RIGHT>FLT_MAX</TD> </TR>
+<TR> <TD>repeat_count</TD>
+     <TD>1</TD>
+     <TD>Repeat contents of the MCPL file this number of times. NB: When running MPI, repeating is implicit and is taken into account by integer division. Should be combined sith the _smear options!
+</TD>
+<TD ALIGN=RIGHT>1</TD> </TR>
+<TR> <TD>E_smear</TD>
+     <TD>1</TD>
+     <TD>When repeating events, make a Gaussian MC choice within E_smear*E around particle energy E
+</TD>
+<TD ALIGN=RIGHT>0</TD> </TR>
+<TR> <TD>pos_smear</TD>
+     <TD>m</TD>
+     <TD>When repeating events, make a flat MC choice of position within pos_smear around particle starting position
+</TD>
+<TD ALIGN=RIGHT>0</TD> </TR>
+<TR> <TD>dir_smear</TD>
+     <TD>deg</TD>
+     <TD>When repeating events, make a Gaussian MC choice of direction within dir_smear around particle direction
+</TD>
+<TD ALIGN=RIGHT>0</TD> </TR>
+</TABLE>
+
+
+<H2><A NAME=opar></A>Output parameters</H2>
+<TABLE BORDER=1>
+<TR><TH>Name</TH>  <TH>Unit</TH>  <TH>Description</TH> <TH>Default</TH></TR>
+<TR> <TD><B>inputfile</B></TD>
+     <TD></TD> <TD></TD>
+<TD ALIGN=RIGHT>&nbsp;</TD> </TR>
+<TR> <TD><B>nparticles</B></TD>
+     <TD></TD> <TD></TD>
+<TD ALIGN=RIGHT>&nbsp;</TD> </TR>
+<TR> <TD><B>read_neutrons</B></TD>
+     <TD></TD> <TD></TD>
+<TD ALIGN=RIGHT>&nbsp;</TD> </TR>
+<TR> <TD><B>used_neutrons</B></TD>
+     <TD></TD> <TD></TD>
+<TD ALIGN=RIGHT>&nbsp;</TD> </TR>
+</TABLE>
+
+
+<H2><A NAME=links></A>Links</H2>
+
+<UL>
+  <LI> <A HREF="MCPL_input.comp">Source code</A> for <CODE>MCPL_input.comp</CODE>.
+</UL>
+<HR>
+<P ALIGN=CENTER>
+ [ <A href="#id">Identification</A>
+ | <A href="#desc">Description</A>
+ | <A href="#ipar">Input parameters</A>
+ | <A href="#opar">Output parameters</A>
+ | <A href="#links">Links</A> ]
+</P>
+
+<ADDRESS>
+Generated automatically by McDoc, Peter Willendrup
+&lt;<A HREF="mailto:peter.willendrup@risoe.dk">peter.willendrup@risoe.dk</A>&gt; /
+Fri Sep 15 09:40:09 2017</ADDRESS>
+</BODY></HTML>
