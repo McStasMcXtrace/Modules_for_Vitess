@@ -14,3 +14,4 @@ Compilation process:
    c) Linux: gcc -lm -O2 McStas_ESS_butterfly.c -o mcstas_ess_butterfly_Linux_x86_64
    d) Linux - for Windows: i686-w64-mingw32-gcc -lm -O2 McStas_ESS_butterfly.c -o mcstas_ess_butterfly.exe
 
+5) The mcstas_ess_butterfly_output.tcl snippet has various local modifications for reasonable defaults within the Vitess system

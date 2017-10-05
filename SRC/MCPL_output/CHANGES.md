@@ -1,21 +1,22 @@
-0) Prerequisites: McStas 2.4.1 installed with Perl tools
+Compilation process:
 
-1.1) Mac and Linux:
+1) Uses a slightly modified MCPL_output.comp from McStas 2.4.1,
+   - #include <sys/stat.h> for allowing compilation on mingw/windows
+   - uses mcpl_close_outfile(outputfile); instead of mcpl_close_and_gzip_outfile(outputfile); as this does not put data on stdout
 
-1.1) Run the command mcstas-2.4.1-environment 
+2) McStas_MCPL_output.instr.raw is the output instr file from the command
+   mcstas2vitess MCPL_output.com 
+   (and McStas_MCPL_output.c.raw the corresponding c output)
 
-1.2) Run mcstas2vitess.pl MCPL_output.comp (will generate .instr code, but not compile)
+   The instr has a modified main() function with a global finished flag, and uses -O rather than lets the used MCPL_output redefine the ncount from what is in the used 
+   event file x repeat_count. For the same reason, the module has no "ncount" defined.
 
-1.3) On Mac:    gcc -g -O2 -lm -o mcstas_mcpl_output_Darwin_x86_64 McStas_MCPL_output.c -lm -I$MCSTAS/libs/mcpl -L$MCSTAS/libs/mcpl -lmcpl
-1.4) On Linux:	gcc -g -O2 -lm -o mcstas_mcpl_output_Linux_x86_64 McStas_MCPL_output.c -lm -I$MCSTAS/libs/mcpl -L$MCSTAS/libs/mcpl -lmcpl
+3) McStas and gcc were run manually for the module generation:
+   a) mcstas --no-main McStas_MCPL_output.instr -o McStas_MCPL_output.c
+   b) MacOS: gcc McStas_MCPL_output.c -o mcstas_ess_butterfly_Darwin_x86_64 -lm -O2 -I$MCSTAS/libs/mcpl/ -L$MCSTAS/libs/mcpl/ -lmcpl
+   c) Linux: gcc McStas_MCPL_output.c -o mcstas_ess_butterfly_Linux_x86_64 -lm -O2 -I$MCSTAS/libs/mcpl/ -L$MCSTAS/libs/mcpl/ -lmcpl
+   d) Linux - for Windows: 
+      1. First you need to recompile an MCPL lib using mingw and place it somewhere, e.g. $PWD/MCPL/
+      2. i686-w64-mingw32-gcc McStas_MCPL_output.c -o mcstas_ess_butterfly.exe -lm -O2 -IMCPL/ -LMCPL -lmcpl
 
-
-2) Windows:
-   Transport .c code to Windows, start the McStas 2.4.1 environment and perform
-   gcc -g -O2 -lm -o mcstas_mcpl_output.exe McStas_MCPL_output.c -lm -Ic:\\mcstas-2.4.1\\lib\\libs\\mcpl -Lc:\\mcstas-2.4.1\\lib\\libs\\mcpl -lmcpl
-
-3) Create docs using Linux or Macos mcdoc.pl:
-mcdoc.pl .
-rm McStas_MCPL_output.html
-mv MCPL_output.html mcstas_mcpl_output.html
-
+4) The mcstas_mcpl_output.tcl snippet has various local modifications for reasonable defaults within the Vitess system

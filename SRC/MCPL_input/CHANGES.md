@@ -16,3 +16,5 @@ Compilation process:
    d) Linux - for Windows: 
       1. First you need to recompile an MCPL lib using mingw and place it somewhere, e.g. $PWD/MCPL/
       2. i686-w64-mingw32-gcc McStas_MCPL_input.c -o mcstas_ess_butterfly.exe -lm -O2 -IMCPL/ -LMCPL -lmcpl
+
+4) The mcstas_mcpl_input.tcl snippet has various local modifications for reasonable defaults within the Vitess system
