@@ -145,7 +145,7 @@ TRACE
     );
 #endif
       } else
-	ABSORB;
+	ABSORB;       
     }
     if (particle->pdgcode!=2112) {
         /*Either no particle read, particle is not a neutron, or it has invalid energy - terminate to trigger next ray*/
