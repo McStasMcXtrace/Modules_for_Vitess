@@ -2,6 +2,8 @@ Copenhagen, 2017/10/5
 
 This repo contains a series of McStas components, translated with minor modifications to become Vitess modules.
 
+A more exhaustive documentation is available at https://confluence.esss.lu.se/pages/viewpage.action?pageId=238390110
+
 **MODULES/** contains binaries for Linux 64bit, Mac OS X and windows - corresponding to the following McStas components:
 1) ESS_butterfly.comp -> mcstas_ess_butterfly
 2) ESS_butterfly_MCPL_instr -> mcstas_ess_butterfly_mcpl
